@@ -1,11 +1,12 @@
 import User from "../models/user.model.js";
-import bcryptjs from "bcryptjs"; // if we write bcrypt only then it will give error in deplyment
-export const signup = async (req, res) => {
-  //   console.log("req", req.body);  instead of consoleing we can save in database
+import bcryptjs from "bcryptjs";
+import { errorHandler } from "../utils/error.js";
+
+export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-    res.status(900).json({message: "all field is requird"});
+    next(errorHandler(400, "All field is require"));
   }
 
   const hashPassword = bcryptjs.hashSync(password, 10);
@@ -19,6 +20,6 @@ export const signup = async (req, res) => {
     await newUser.save();
     res.json("Signup Sucesss");
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
